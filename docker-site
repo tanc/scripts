@@ -1,0 +1,39 @@
+#!/bin/bash
+
+###
+# Prepares a docker4drupal based docker set up.
+#
+# Should be run in the directory above the gitroot and should not be committed
+# to any repositories.
+#
+# Will fetch the latest docker-compose.yml file from docker4drupal repo,
+# then will fetch the patch file for the specified Drupal version and will
+# patch the docker-compose.yml file so that the needed changes to support
+# the Agile Collective standard layout is implemented.
+#
+# Parameters: A single parameter, either 7 or 8, to specify the drupal/patch version.
+# 
+# Example: $ docker-site 7 (will patch for a Drupal 7 site).
+# 
+# Note that if the parameter is omitted it will default to Drupal 8.
+###
+
+# Check if a parameter has been used (either 7 or 8 allowed) otherwise default
+# to 8 if omitted.
+if [ -z "$1" ]; then
+  PATCH_VERSION=8
+else
+  # Validate the parameter is either 7 or 8.
+  if [ "$1" -ge 7 -a "$1" -le 8 ]; then
+    PATCH_VERSION=$1
+  else
+    echo "please specify either 7 or 8 as the parameter or omit to use 8"
+    exit 1
+  fi
+fi
+
+echo "downloading patch version $PATCH_VERSION"
+ 
+curl -s -L -O https://raw.github.com/wodby/docker4drupal/master/docker-compose.yml; curl -s -L https://gist.github.com/tanc/94ea8b21b29cb842daa93534e2dc4b9d/raw/drupal$PATCH_VERSION.patch | patch
+
+exit 0
