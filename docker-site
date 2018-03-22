@@ -34,6 +34,6 @@ fi
 
 echo "downloading patch version $PATCH_VERSION"
  
-curl -s -L -O https://raw.github.com/wodby/docker4drupal/master/docker-compose.yml; curl -s -L https://gist.github.com/tanc/94ea8b21b29cb842daa93534e2dc4b9d/raw/drupal$PATCH_VERSION.patch | patch
+curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/2.5.0/docker-compose.yml; curl -s -L https://gist.github.com/tanc/94ea8b21b29cb842daa93534e2dc4b9d/raw/drupal$PATCH_VERSION.patch | patch
 
 exit 0
