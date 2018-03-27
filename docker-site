@@ -11,29 +11,44 @@
 # patch the docker-compose.yml file so that the needed changes to support
 # the Agile Collective standard layout is implemented.
 #
-# Parameters: A single parameter, either 7 or 8, to specify the drupal/patch version.
+# Parameters:
+# -v version: Either 7 or 8, to specify the drupal/patch version.
+# -n name: The name of the project. Usually a shortcode or something easy to remember.
 # 
-# Example: $ docker-site 7 (will patch for a Drupal 7 site).
+# Example: $ docker-site -v 7 -n mysite (will patch for a Drupal 8 project called mysite).
 # 
 # Note that if the parameter is omitted it will default to Drupal 8.
 ###
 
-# Check if a parameter has been used (either 7 or 8 allowed) otherwise default
-# to 8 if omitted.
-if [ -z "$1" ]; then
-  PATCH_VERSION=8
-else
-  # Validate the parameter is either 7 or 8.
-  if [ "$1" -ge 7 -a "$1" -le 8 ]; then
-    PATCH_VERSION=$1
-  else
-    echo "please specify either 7 or 8 as the parameter or omit to use 8"
-    exit 1
-  fi
+PATCH_VERSION=8;
+
+while getopts v:n: option; do
+  case "${option}" in
+    v) PATCH_VERSION=${OPTARG};;
+    n) NAME=${OPTARG};;
+    \?) echo "Usage: docker-site [-v] 8 [-n] mysite"; exit 0
+  esac
+done
+
+# Validate the PATCH_VERSION is either 7 or 8.
+if [ "$PATCH_VERSION" -gt 8 ]; then
+  echo "please specify either 7 or 8 as the version parameter or omit to use 8"
+  exit 1
 fi
 
-echo "downloading patch version $PATCH_VERSION"
- 
-curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/2.5.0/docker-compose.yml; curl -s -L https://gist.github.com/tanc/94ea8b21b29cb842daa93534e2dc4b9d/raw/drupal$PATCH_VERSION.patch | patch
+if [ "$PATCH_VERSION" -lt 7 ]; then
+  echo "please specify either 7 or 8 as the version parameter or omit to use 8"
+  exit 1
+fi
+
+if [ -z $NAME ]; then
+  echo "please provide a project name"; exit 1
+fi
+
+curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/5.0.1/.env; curl -s -L "https://gist.github.com/tanc/354d0c42dabe0f41246701cbf2bf6854/raw/env$PATCH_VERSION.patch" | patch
+curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/5.0.1/docker-compose.yml; curl -s -L https://gist.github.com/tanc/354d0c42dabe0f41246701cbf2bf6854/raw/docker-compose.yml.patch | patch
+
+echo "updating .env to use project name $NAME"
+sed -i '' -e "s/my_drupal8_project/$NAME/g" ".env"
 
 exit 0
