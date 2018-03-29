@@ -20,6 +20,8 @@
 # Note that if the parameter is omitted it will default to Drupal 8.
 ###
 
+timestamp=$(date +%s)
+
 PATCH_VERSION=8;
 
 while getopts v:n: option; do
@@ -45,8 +47,8 @@ if [ -z $NAME ]; then
   echo "please provide a project name"; exit 1
 fi
 
-curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/5.0.1/.env; curl -s -L "https://gist.github.com/tanc/354d0c42dabe0f41246701cbf2bf6854/raw/env$PATCH_VERSION.patch" | patch
-curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/5.0.1/docker-compose.yml; curl -s -L https://gist.github.com/tanc/354d0c42dabe0f41246701cbf2bf6854/raw/docker-compose.yml.patch | patch
+curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/5.0.1/.env; curl -s -L "https://gist.github.com/tanc/354d0c42dabe0f41246701cbf2bf6854/raw/env$PATCH_VERSION.patch?$timestamp" | patch
+curl -s -L -O https://raw.githubusercontent.com/wodby/docker4drupal/5.0.1/docker-compose.yml; curl -s -L https://gist.github.com/tanc/354d0c42dabe0f41246701cbf2bf6854/raw/docker-compose.yml.patch?$timestamp | patch
 
 echo "updating .env to use project name $NAME"
 sed -i '' -e "s/my_drupal8_project/$NAME/g" ".env"
